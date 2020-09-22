@@ -30,3 +30,32 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+class Donation(models.Model):
+    PAYMENT_METHOD = (
+        ('BankTransfer', 'BankTransfer'),
+        ('PayTM', 'PayTM'),
+        ('GooglePay', 'GooglePay'),
+        ('CreditCard', 'CreditCard'),
+        ('DebitCard', 'DebitCard')
+    )
+    donated_by = models.ForeignKey(User,related_name="donor", on_delete=models.CASCADE)
+    amount_donated = models.FloatField()
+    donated_on = models.DateTimeField(default=timezone.now, editable=False)
+    bank_name = models.CharField(max_length=25)
+    bank_branch = models.CharField(max_length=50)
+    payment_method = models.CharField(max_length=12, choices=PAYMENT_METHOD)
+
+    def __str__(self):
+        return self.donated_by.username
+
+class Redeem(models.Model):
+    title = models.CharField(max_length=30)
+    brand = models.CharField(max_length=30)
+    description = models.TextField()
+    price = models.IntegerField(default=0)
+    image = models.ImageField(default='default1.png', upload_to='images/')
+    created = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+        
