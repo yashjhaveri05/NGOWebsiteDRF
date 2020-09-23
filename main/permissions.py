@@ -14,3 +14,12 @@ class IsAdmin(permissions.BasePermission):
             return True
         else:
             return False
+
+class Permit(permissions.BasePermission):
+    message: "Not allowed To Access"
+
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            return True
+        else:
+            return False

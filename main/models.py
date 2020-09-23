@@ -58,4 +58,14 @@ class Redeem(models.Model):
 
     def __str__(self):
         return self.title
+
+class Achievement(models.Model):
+    event = models.OneToOneField(Event,on_delete=models.CASCADE)
+    details = models.TextField()
+    awards = models.TextField(blank=True)
+    funds_used = models.FloatField()
+    image = models.ImageField(default='default.png', upload_to='images/')
+
+    def __str__(self):
+        return self.event.title
         

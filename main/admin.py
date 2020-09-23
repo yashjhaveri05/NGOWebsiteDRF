@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User,Event,Donation,Redeem
+from .models import User,Event,Donation,Redeem,Achievement
 
 class MyUserAdmin(UserAdmin):
     model = User
@@ -26,7 +26,18 @@ class EventAdmin(admin.ModelAdmin):
 class DonationAdmin(admin.ModelAdmin):
     list_display = ('donated_by','amount_donated','donated_on', 'bank_name', 'bank_branch', 'payment_method')
 
+class AchievementAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Event", {'fields': ["event"]}),
+        ("Details", {'fields': ["details"]}),
+        ("Awards", {'fields': ["awards"]}),
+        ("Funds Used", {'fields': ["funds_used"]}),
+        ("Image", {'fields': ["image"]}),
+    ]
+    list_display = ('event','funds_used')
+
 admin.site.register(User, MyUserAdmin)
-admin.site.register(Event)
+admin.site.register(Event,EventAdmin)
 admin.site.register(Donation,DonationAdmin)
 admin.site.register(Redeem)
+admin.site.register(Achievement,AchievementAdmin)
