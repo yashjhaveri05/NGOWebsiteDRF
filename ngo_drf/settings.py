@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'main.apps.MainConfig',
-    'rest_framework.authtoken',
+    #'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -59,9 +59,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    )
+    #"DEFAULT_AUTHENTICATION_CLASSES": (
+    #    "rest_framework.authentication.TokenAuthentication",
+    #)
 }
 
 TEMPLATES = [
