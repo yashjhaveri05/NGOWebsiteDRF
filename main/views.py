@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from main.models import User,Event,Donation,Redeem,Achievement
 from main.serializers import UserSerializer,EventSerializer,DonationSerializer,RedeemSerializer,AchievementSerializer,RegisterSerializer
 from main.permissions import IsOwnerOrReadOnly,IsAdmin,Permit
-from rest_framework.decorators import api_view,authentication_classes
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -12,6 +11,12 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from rest_framework.views import APIView
 import math
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 """
 User
@@ -59,6 +64,13 @@ def signin(request):
             data={"Message": "Only POST request allowed"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+class Logout(APIView):
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
+        
 """
 """
 Events
@@ -85,6 +97,7 @@ class EventCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -99,6 +112,7 @@ class EventCrud(mixins.UpdateModelMixin,
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -115,6 +129,7 @@ class DonationList(mixins.ListModelMixin,generics.GenericAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -127,6 +142,7 @@ class DonationCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -134,8 +150,9 @@ class DonationCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     def perform_create(self, serializer):
         serializer.save(donated_by=self.request.user)
 
-#Or this
-#need to add permissions and authentication classes(Not Working)
+#Or this(Not Working)
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(["POST"])
 def donate(request):
     if request.method == "POST":
@@ -193,6 +210,7 @@ class RedeemCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     queryset = Redeem.objects.all()
     serializer_class = RedeemSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -207,6 +225,7 @@ class RedeemCrud(mixins.UpdateModelMixin,
     queryset = Redeem.objects.all()
     serializer_class = RedeemSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -257,6 +276,7 @@ class AchievementCrud(mixins.UpdateModelMixin,
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsAdmin]
+    authentication_classes = [TokenAuthentication]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -265,7 +285,8 @@ class AchievementCrud(mixins.UpdateModelMixin,
         return self.destroy(request, *args, **kwargs)
 
 #Becoming a volunteer button based on event_id(Working if logged in)
-#need to add permissions and authentication classes
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(['POST'])
 def become_volunteer(request,pk):
     user=request.user
@@ -277,7 +298,8 @@ def become_volunteer(request,pk):
 """
 User Dashboard
 """
-#need to add permissions and authentication classes(Working if logged in)
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(['GET'])
 def donations_made(request):
     if request.method == 'GET':
@@ -285,7 +307,8 @@ def donations_made(request):
         serializer = DonationSerializer(donations, many=True)
         return Response(serializer.data)
 
-#need to add permissions and authentication classes(Working if logged in)
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(['GET'])
 def volunteered_in(request):
     volunteers = Event.objects.filter(volunteers=request.user)

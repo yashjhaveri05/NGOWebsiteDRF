@@ -8,7 +8,8 @@ urlpatterns = [
     #path("register/", views.UserCreate.as_view()),
     #SignIn
     #path("login/", views.signin, name="signin"),
-    #path("Logout", views.Logout, name="Logout"),
+    #Logout
+    #path('logout/', Logout.as_view(), name="logout"),
     #Event List View
     path('events/', views.EventList.as_view()),
     #Event Create Page
