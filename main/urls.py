@@ -5,45 +5,43 @@ from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     #SignUp
-    #path("register/", views.UserCreate.as_view()),
+    path("register/", views.UserCreate.as_view()),
     #SignIn
-    #path("login/", views.signin, name="signin"),
+    path("login/", views.signin, name="signin"),
     #Logout
-    #path('logout/', Logout.as_view(), name="logout"),
+    path('logout/', views.Logout.as_view(), name="logout"),
     #Event List View
-    path('events/', views.EventList.as_view()),
+    path('events/', views.EventList.as_view(), name="events"),
     #Event Create Page
-    path('events/new/', views.EventCreate.as_view()),
+    path('events/new/', views.EventCreate.as_view(), name="event_create"),
     #Event Detail View
-    path('events/<int:pk>/', views.EventDetail.as_view()),
+    path('events/<int:pk>/', views.EventDetail.as_view(), name="event_detail"),
     #Event Update,Delete
-    path('events_crud/<int:pk>/', views.EventCrud.as_view()),
+    path('events_crud/<int:pk>/', views.EventCrud.as_view(), name="event_crud"),
     #Donation List
-    path('donations/', views.DonationList.as_view()),
+    path('donations/', views.DonationList.as_view(), name="donations"),
     #Donation Made(Make Decision)
-    path('donate/', views.DonationCreate.as_view()),
-    path('mkdonation/', views.donate),
+    path('mkdonation/', views.donate, name="donate"),
     #Redeem List
-    path('redeem/', views.RedeemList.as_view()),
+    path('redeem/', views.RedeemList.as_view(), name="redeem"),
     #Redeem Create
-    path('redeem/new/', views.RedeemCreate.as_view()),
+    path('redeem/new/', views.RedeemCreate.as_view(), name="redeem_create"),
     #Redeem Detail
-    path('redeem_detail/<int:pk>/', views.RedeemDetail.as_view()),
+    path('redeem_detail/<int:pk>/', views.RedeemDetail.as_view(), name="redeem_detail"),
     #Redeem Update,Delete
-    path('redeem_crud/<int:pk>/', views.RedeemCrud.as_view()),
+    path('redeem_crud/<int:pk>/', views.RedeemCrud.as_view(), name="redeem_crud"),
     #Become Volunteer
-    path('volunteer/<int:pk>/',views.become_volunteer),
+    path('volunteer/<int:pk>/',views.become_volunteer, name="volunteering"),
     #User Donations For User Dashboard
-    path('user_donations/', views.donations_made),
+    path('user_donations/', views.donations_made, name="user_donations"),
     #User Volunteering For User Dashboard
-    path('volunteered_in/', views.volunteered_in),
+    path('volunteered_in/', views.volunteered_in, name="user_volunteered"),
     #Achievement List View
-    path('achievements/', views.AchievementList.as_view()),
+    path('achievements/', views.AchievementList.as_view(), name="achievements"),
     #Event Detail View
-    path('achievements/<int:pk>/', views.AchievementDetail.as_view()),
+    path('achievements/<int:pk>/', views.AchievementDetail.as_view(), name="achievements_detail"),
     #Event Update,Delete
-    path('achievements_crud/<int:pk>/', views.AchievementCrud.as_view()),
+    path('achievements_crud/<int:pk>/', views.AchievementCrud.as_view(), name="achievements_crud"),
     #Achievement Create
-    path('achievement_create/<int:pk>/', csrf_exempt(views.achievement_create))
-    #To Be Done: achievements CRUD,Logout,Others,Check if others work
+    path('achievement_create/<int:pk>/', views.achievement_create, name="achievements_create")
 ]

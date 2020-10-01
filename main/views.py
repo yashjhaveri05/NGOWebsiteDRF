@@ -21,7 +21,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 """
 User
 """
-"""
 #SignUp
 class UserCreate(APIView):
     def post(self, request, format='json'):
@@ -71,12 +70,12 @@ class Logout(APIView):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
         
-"""
+
 """
 Events
 """
 
-#Event List View for Everybody(Working)
+#Event List View for Everybody
 class EventList(generics.GenericAPIView):
 
     def get(self, request):
@@ -84,7 +83,7 @@ class EventList(generics.GenericAPIView):
         event_list = EventSerializer(events,many=True).data
         return JsonResponse(event_list, status=status.HTTP_200_OK, safe=False)
 
-#Event Detail Page for Everybody(Working)
+#Event Detail Page for Everybody
 class EventDetail(mixins.RetrieveModelMixin,generics.GenericAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -92,7 +91,7 @@ class EventDetail(mixins.RetrieveModelMixin,generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-#Event Create View only for Admin(Working)
+#Event Create View only for Admin
 class EventCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -105,7 +104,7 @@ class EventCreate(mixins.CreateModelMixin,generics.GenericAPIView):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
-#Event Update,Delete for Admin only(Working)
+#Event Update,Delete for Admin only
 class EventCrud(mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     generics.GenericAPIView):
@@ -124,7 +123,7 @@ class EventCrud(mixins.UpdateModelMixin,
 Donations
 """
 
-#Donation List for admin only(Working)
+#Donation List for admin only
 class DonationList(mixins.ListModelMixin,generics.GenericAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
@@ -134,23 +133,7 @@ class DonationList(mixins.ListModelMixin,generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-#Donation Made for everybody
-
-#Either this
-#need to add permissions and authentication classes(Not Working though before it was)
-class DonationCreate(mixins.CreateModelMixin,generics.GenericAPIView):
-    queryset = Donation.objects.all()
-    serializer_class = DonationSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        serializer.save(donated_by=self.request.user)
-
-#Or this(Not Working)
+#Make Donation for everybody
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(["POST"])
@@ -169,6 +152,7 @@ def donate(request):
             for user in users:
                 credit = user.coins + credits_earned
             users.update(coins=credit)
+            return Response("Donated", status=status.HTTP_200_OK)
             
         except Exception as e:
             print(e)
@@ -237,31 +221,34 @@ class RedeemCrud(mixins.UpdateModelMixin,
         return self.destroy(request, *args, **kwargs)
 
 """
-Achievements(Left)
+Achievements
 """
-#not working
+#Creating Achievement By Admin
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticatedOrReadOnly,IsAdmin])
 @api_view(['POST'])
 def achievement_create(request,pk):
     if request.method == 'POST':
+        event = Event.objects.get(id=pk)
         details = request.data.get("details")
         awards = request.data.get("awards")
         funds_used = request.data.get("funds_used")
         image = request.data.get("image")
-        achievement = Achievement.object.create(event=pk,details=details,awards=awards,funds_used=funds_used,image=image)
+        achievement = Achievement.objects.create(event=event,details=details,awards=awards,funds_used=funds_used,image=image)
         serializer = AchievementSerializer(achievement, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#Achievement List(Working)
+#Achievement List
 class AchievementList(generics.GenericAPIView):
     def get(self, request):
         achievements = Achievement.objects.all()
         achievements_list = AchievementSerializer(achievements,many=True).data
         return JsonResponse(achievements_list, status=status.HTTP_200_OK, safe=False)
 
-#Achievement Detail Page for Everybody(Working)
+#Achievement Detail Page for Everybody
 class AchievementDetail(mixins.RetrieveModelMixin,generics.GenericAPIView):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
@@ -269,7 +256,7 @@ class AchievementDetail(mixins.RetrieveModelMixin,generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-#Achievement Update,Delete for Admin only(Working)
+#Achievement Update,Delete for Admin only
 class AchievementCrud(mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     generics.GenericAPIView):
@@ -284,7 +271,7 @@ class AchievementCrud(mixins.UpdateModelMixin,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-#Becoming a volunteer button based on event_id(Working if logged in)
+#Becoming a volunteer button based on event_id
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticatedOrReadOnly])
 @api_view(['POST'])
